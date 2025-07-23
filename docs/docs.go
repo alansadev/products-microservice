@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/products": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Return an array with all products",
                 "produces": [
                     "application/json"
@@ -38,6 +43,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Add a product to database",
                 "consumes": [
                     "application/json"
@@ -72,6 +82,11 @@ const docTemplate = `{
         },
         "/products/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Return data only unique product",
                 "produces": [
                     "application/json"
@@ -108,6 +123,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Remove a product to database by your ID",
                 "tags": [
                     "products"
@@ -138,6 +158,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update data of product by exists ID",
                 "consumes": [
                     "application/json"
@@ -188,6 +213,11 @@ const docTemplate = `{
         },
         "/products/{id}/stock": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Adjusts a product's inventory atomically. Use a negative value to decrease inventory.",
                 "consumes": [
                     "application/json"
@@ -247,6 +277,11 @@ const docTemplate = `{
         },
         "/products/{id}/upload": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Received image and associate url to product",
                 "consumes": [
                     "multipart/form-data"
@@ -354,9 +389,9 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:3000",
+	Host:             "",
 	BasePath:         "/api",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"http", "https"},
 	Title:            "Product API - Sabor da Rondônia",
 	Description:      "Microservice responsible for product management.",
 	InfoInstanceName: "swagger",

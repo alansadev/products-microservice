@@ -24,7 +24,6 @@ definitions:
       updated_at:
         type: string
     type: object
-host: localhost:3000
 info:
   contact: {}
   description: Microservice responsible for product management.
@@ -43,6 +42,8 @@ paths:
             items:
               $ref: '#/definitions/models.Product'
             type: array
+      security:
+      - ApiKeyAuth: []
       summary: List all Products
       tags:
       - products
@@ -64,6 +65,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.Product'
+      security:
+      - ApiKeyAuth: []
       summary: Create a new Product
       tags:
       - products
@@ -85,6 +88,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Delete a Product
       tags:
       - products
@@ -109,6 +114,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Find product by id
       tags:
       - products
@@ -141,6 +148,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update a Product
       tags:
       - products
@@ -181,6 +190,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Updates the stock of a product
       tags:
       - products
@@ -219,11 +230,14 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - ApiKeyAuth: []
       summary: Upload image from product
       tags:
       - products
 schemes:
 - http
+- https
 securityDefinitions:
   ApiKeyAuth:
     in: header

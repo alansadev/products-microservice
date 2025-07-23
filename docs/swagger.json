@@ -1,6 +1,7 @@
 {
     "schemes": [
-        "http"
+        "http",
+        "https"
     ],
     "swagger": "2.0",
     "info": {
@@ -9,11 +10,15 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:3000",
     "basePath": "/api",
     "paths": {
         "/products": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Return an array with all products",
                 "produces": [
                     "application/json"
@@ -35,6 +40,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Add a product to database",
                 "consumes": [
                     "application/json"
@@ -69,6 +79,11 @@
         },
         "/products/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Return data only unique product",
                 "produces": [
                     "application/json"
@@ -105,6 +120,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Remove a product to database by your ID",
                 "tags": [
                     "products"
@@ -135,6 +155,11 @@
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update data of product by exists ID",
                 "consumes": [
                     "application/json"
@@ -185,6 +210,11 @@
         },
         "/products/{id}/stock": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Adjusts a product's inventory atomically. Use a negative value to decrease inventory.",
                 "consumes": [
                     "application/json"
@@ -244,6 +274,11 @@
         },
         "/products/{id}/upload": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Received image and associate url to product",
                 "consumes": [
                     "multipart/form-data"

@@ -33,6 +33,7 @@ type UpdateStockRequest struct {
 // @Produce     json
 // @Param       product body models.Product true "Data of Product (ID, CreatedAt, UpdatedAt are ignored)"
 // @Success     201 {object} models.Product
+// @Security     ApiKeyAuth
 // @Router      /products [post]
 func CreateProduct(c *fiber.Ctx) error {
 	db := database.DB
@@ -56,6 +57,7 @@ func CreateProduct(c *fiber.Ctx) error {
 // @Tags         products
 // @Produce      json
 // @Success      200  {array}   models.Product
+// @Security     ApiKeyAuth
 // @Router       /products [get]
 func GetProducts(c *fiber.Ctx) error {
 	db := database.DB
@@ -76,6 +78,7 @@ func GetProducts(c *fiber.Ctx) error {
 // @Produce      json
 // @Param        request body      BatchRequest  true  "List of product IDs"
 // @Success      200     {array}   models.Product
+// @Security     ApiKeyAuth
 // @Router       /products/batch [post]
 
 func GetProductsByIDs(c *fiber.Ctx) error {
@@ -106,6 +109,7 @@ func GetProductsByIDs(c *fiber.Ctx) error {
 // @Param       id path string true "Product ID (UUID)"
 // @Success     200 {object} models.Product
 // @Failure     404 {object} map[string]string
+// @Security     ApiKeyAuth
 // @Router      /products/{id} [get]
 func GetProductByID(c *fiber.Ctx) error {
 	db := database.DB
@@ -133,6 +137,7 @@ func GetProductByID(c *fiber.Ctx) error {
 // @Param        product  body      models.Product  true  "New Product Data"
 // @Success      200      {object}  models.Product
 // @Failure      404      {object}  map[string]string
+// @Security     ApiKeyAuth
 // @Router       /products/{id} [patch]
 func PatchProduct(c *fiber.Ctx) error {
 	db := database.DB
@@ -169,6 +174,7 @@ func PatchProduct(c *fiber.Ctx) error {
 // @Param        id   path      string  true  "Product ID (UUID)"
 // @Success      204  {object}  nil
 // @Failure      404  {object}  map[string]string
+// @Security     ApiKeyAuth
 // @Router       /products/{id} [delete]
 func DeleteProduct(c *fiber.Ctx) error {
 	db := database.DB
@@ -219,6 +225,7 @@ func DeleteProduct(c *fiber.Ctx) error {
 // @Success     200 {object} models.Product
 // @Failure     400 {object} map[string]string
 // @Failure     404 {object} map[string]string
+// @Security     ApiKeyAuth
 // @Router      /products/{id}/upload [post]
 func UploadProductImage(c *fiber.Ctx) error {
 	db := database.DB
@@ -285,6 +292,7 @@ func UploadProductImage(c *fiber.Ctx) error {
 // @Success      200      {object}  models.Product
 // @Failure      400      {object}  map[string]string
 // @Failure      404      {object}  map[string]string
+// @Security     ApiKeyAuth
 // @Router       /products/{id}/stock [post]
 func UpdateStock(c *fiber.Ctx) error {
 	db := database.DB
