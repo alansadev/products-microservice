@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
 	"products/database"
 	_ "products/docs"
@@ -23,8 +25,14 @@ func main() {
 
 	app := fiber.New()
 
-	api := app.Group("/api")
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*", // Permite todas as origens
+		AllowHeaders: "Origin, Content-Type, Accept, X-API-KEY",
+	}))
 
+	app.Use(logger.New())
+
+	api := app.Group("/api")
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	productGroup := api.Group("/products", middleware.AuthMiddleware())

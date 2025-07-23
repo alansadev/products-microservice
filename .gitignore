@@ -19,5 +19,7 @@
 
 *.log
 
+coverage
+
 .DS_Store
 Thumbs.db
