@@ -5,8 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
-	"log"
-	"os"
 	"products/database"
 	_ "products/docs"
 	"products/handlers"
@@ -23,12 +21,6 @@ import (
 // @name X-API-Key
 func main() {
 	database.Connect()
-
-	loadedApiKey := os.Getenv("API_SECRET_KEY")
-	log.Printf("DEBUG: API_SECRET_KEY carregada: [%s]", loadedApiKey)
-	if loadedApiKey == "" {
-		log.Println("AVISO CRÍTICO: API_SECRET_KEY está vazia. A autenticação irá falhar.")
-	}
 
 	app := fiber.New()
 
