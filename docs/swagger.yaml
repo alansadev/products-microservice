@@ -1,5 +1,10 @@
 basePath: /api
 definitions:
+  handlers.UpdateStockRequest:
+    properties:
+      quantity_change:
+        type: integer
+    type: object
   models.Product:
     properties:
       created_at:
@@ -22,8 +27,8 @@ definitions:
 host: localhost:3000
 info:
   contact: {}
-  description: Microserviço responsável pelo gerenciamento de produtos.
-  title: API de Produtos - Sabor da Rondonia
+  description: Microservice responsible for product management.
+  title: Product API - Sabor da Rondônia
   version: "1.0"
 paths:
   /products:
@@ -137,6 +142,46 @@ paths:
               type: string
             type: object
       summary: Update a Product
+      tags:
+      - products
+  /products/{id}/stock:
+    post:
+      consumes:
+      - application/json
+      description: Adjusts a product's inventory atomically. Use a negative value
+        to decrease inventory.
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Change in stock quantity
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateStockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Updates the stock of a product
       tags:
       - products
   /products/{id}/upload:

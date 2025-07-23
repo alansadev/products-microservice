@@ -186,6 +186,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/products/{id}/stock": {
+            "post": {
+                "description": "Adjusts a product's inventory atomically. Use a negative value to decrease inventory.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Updates the stock of a product",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Product ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Change in stock quantity",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateStockRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/products/{id}/upload": {
             "post": {
                 "description": "Received image and associate url to product",
@@ -245,6 +304,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handlers.UpdateStockRequest": {
+            "type": "object",
+            "properties": {
+                "quantity_change": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Product": {
             "type": "object",
             "properties": {
@@ -290,8 +357,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:3000",
 	BasePath:         "/api",
 	Schemes:          []string{"http"},
-	Title:            "API de Produtos - Sabor da Rondonia",
-	Description:      "Microserviço responsável pelo gerenciamento de produtos.",
+	Title:            "Product API - Sabor da Rondônia",
+	Description:      "Microservice responsible for product management.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

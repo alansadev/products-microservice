@@ -5,7 +5,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
+	"os"
 	"products/database"
+	"products/docs"
 	_ "products/docs"
 	"products/handlers"
 	"products/middleware"
@@ -22,6 +24,12 @@ import (
 // @name X-API-Key
 func main() {
 	database.Connect()
+
+	hostURL := os.Getenv("HOST_URL")
+
+	if hostURL != "" {
+		docs.SwaggerInfo.Host = hostURL
+	}
 
 	app := fiber.New()
 
