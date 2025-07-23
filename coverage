@@ -94,7 +94,7 @@ products/handlers/product_handler.go:45.2,45.50 1 0
 products/handlers/product_handler.go:45.50,48.3 2 0
 products/handlers/product_handler.go:50.2,50.52 1 0
 products/handlers/product_handler.go:60.38,64.49 3 1
-products/handlers/product_handler.go:64.49,67.3 2 0
+products/handlers/product_handler.go:64.49,67.3 2 1
 products/handlers/product_handler.go:68.2,68.25 1 1
 products/handlers/product_handler.go:81.43,85.46 3 0
 products/handlers/product_handler.go:85.46,87.3 1 0

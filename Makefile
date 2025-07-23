@@ -1,19 +1,17 @@
 COVER_PKGS = "./handlers,./middleware,./models"
 
-COVER_PROFILE = coverage.out
+COVER_PROFILE = coverage
 
 default: help
 
 test-coverage:
-	@echo "--> Gerando relatório de cobertura de testes..."
-	# Executa os testes, medindo a cobertura apenas dos pacotes especificados e salvando o resultado.
+	@echo "--> Generating test coverage report..."
 	go test -coverpkg=$(COVER_PKGS) -coverprofile=$(COVER_PROFILE) ./...
-	@echo "--> Abrindo relatório no navegador..."
-	# Abre o relatório HTML interativo.
+	@echo "--> Open coverage in browser..."
 	go tool cover -html=$(COVER_PROFILE)
 
 help:
 	@echo ""
-	@echo "Comandos disponíveis:"
-	@echo " make test-coverage    Gera e exibe o relatório de cobertura de testes."
+	@echo "Available commands:"
+	@echo " make test-coverage    Generates and displays the test coverage report."
 	@echo ""
