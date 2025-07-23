@@ -1,0 +1,187 @@
+basePath: /api
+definitions:
+  models.Product:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      stock:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: Microserviço responsável pelo gerenciamento de produtos.
+  title: API de Produtos - Sabor da Rondonia
+  version: "1.0"
+paths:
+  /products:
+    get:
+      description: Return an array with all products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+      summary: List all Products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Add a product to database
+      parameters:
+      - description: Data of Product (ID, CreatedAt, UpdatedAt are ignored)
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Product'
+      summary: Create a new Product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      description: Remove a product to database by your ID
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a Product
+      tags:
+      - products
+    get:
+      description: Return data only unique product
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Find product by id
+      tags:
+      - products
+    patch:
+      consumes:
+      - application/json
+      description: Update data of product by exists ID
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New Product Data
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a Product
+      tags:
+      - products
+  /products/{id}/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Received image and associate url to product
+      parameters:
+      - description: Product ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product Image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Upload image from product
+      tags:
+      - products
+schemes:
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-Key
+    type: apiKey
+swagger: "2.0"
