@@ -9,9 +9,9 @@ import (
 	"products/middleware"
 )
 
-// @title API de Produtos - Sabor da Rondonia
+// @title Product API - Sabor da Rondônia
 // @version 1.0
-// @description Microserviço responsável pelo gerenciamento de produtos.
+// @description Microservice responsible for product management.
 // @host localhost:3000
 // @BasePath /api
 // @schemes http
@@ -27,7 +27,7 @@ func main() {
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
-	productGroup := api.Group("/products", middleware.AuthRequired())
+	productGroup := api.Group("/products", middleware.AuthMiddleware())
 
 	productGroup.Post("/", handlers.CreateProduct)
 	productGroup.Get("/", handlers.GetProducts)

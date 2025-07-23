@@ -26,14 +26,14 @@ type UpdateStockRequest struct {
 }
 
 // CreateProduct godoc
-// @Summary Create a new Product
+// @Summary     Create a new Product
 // @Description Add a product to database
-// @Tags products
-// @Accept json
-// @Produce json
-// @Param product body models.Product true "Data of Product (ID, CreatedAt, UpdatedAt are ignored)"
-// @Success 201 {object} models.Product
-// @Router /products [post]
+// @Tags        products
+// @Accept      json
+// @Produce     json
+// @Param       product body models.Product true "Data of Product (ID, CreatedAt, UpdatedAt are ignored)"
+// @Success     201 {object} models.Product
+// @Router      /products [post]
 func CreateProduct(c *fiber.Ctx) error {
 	db := database.DB
 	product := new(models.Product)
@@ -69,7 +69,7 @@ func GetProducts(c *fiber.Ctx) error {
 }
 
 // GetProductsByIDs godoc
-// @Summary Search multiple products by a list of IDs
+// @Summary      Search multiple products by a list of IDs
 // @Description  Returns an array with the products corresponding to the submitted IDs.
 // @Tags         products
 // @Accept       json
@@ -99,14 +99,14 @@ func GetProductsByIDs(c *fiber.Ctx) error {
 }
 
 // GetProductByID godoc
-// @Summary Find product by id
+// @Summary     Find product by id
 // @Description Return data only unique product
-// @Tags products
-// @Produce json
-// @Param id path string true "Product ID (UUID)"
-// @Success 200 {object} models.Product
-// @Failure 404 {object} map[string]string
-// @Router /products/{id} [get]
+// @Tags        products
+// @Produce     json
+// @Param       id path string true "Product ID (UUID)"
+// @Success     200 {object} models.Product
+// @Failure     404 {object} map[string]string
+// @Router      /products/{id} [get]
 func GetProductByID(c *fiber.Ctx) error {
 	db := database.DB
 	id, err := uuid.Parse(c.Params("id"))
@@ -209,17 +209,17 @@ func DeleteProduct(c *fiber.Ctx) error {
 }
 
 // UploadProductImage godoc
-// @Summary Upload image from product
+// @Summary     Upload image from product
 // @Description Received image and associate url to product
-// @Tags products
-// @Accept multipart/form-data
-// @Produce json
-// @Param id path string true "Product ID (UUID)"
-// @Param image formData file true "Product Image"
-// @Success 200 {object} models.Product
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Router /products/{id}/upload [post]
+// @Tags        products
+// @Accept      multipart/form-data
+// @Produce     json
+// @Param       id path string true "Product ID (UUID)"
+// @Param       image formData file true "Product Image"
+// @Success     200 {object} models.Product
+// @Failure     400 {object} map[string]string
+// @Failure     404 {object} map[string]string
+// @Router      /products/{id}/upload [post]
 func UploadProductImage(c *fiber.Ctx) error {
 	db := database.DB
 	id, err := uuid.Parse(c.Params("id"))

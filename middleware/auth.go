@@ -5,9 +5,9 @@ import (
 	"os"
 )
 
-func AuthRequired() fiber.Handler {
+func AuthMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		apikey := c.Get("X-API-KEY")
+		apikey := c.Get("X-API-Key")
 
 		secretKey := os.Getenv("API_SECRET_KEY")
 
