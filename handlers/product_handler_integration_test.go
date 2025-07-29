@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/glebarez/sqlite"
@@ -10,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"io"
 	"log"
+	"net/http"
 	"net/http/httptest"
 	"products/database"
 	"products/models"
@@ -36,6 +38,10 @@ func setupTestApp() *fiber.App {
 	productGroup := api.Group("/products")
 	productGroup.Get("/", GetProducts)
 	productGroup.Get("/:id", GetProductByID)
+	productGroup.Post("/", CreateProduct)
+	productGroup.Patch("/:id", PatchProduct)
+	productGroup.Delete("/:id", DeleteProduct)
+
 	return app
 }
 
@@ -176,6 +182,225 @@ func TestGetProductByID(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, tc.expectedName, returnedProduct.Name)
 			}
+		})
+	}
+}
+
+func TestCreateProduct(t *testing.T) {
+	testCases := []struct {
+		name           string
+		payload        string
+		setup          func(t *testing.T)
+		expectedStatus int
+		verify         func(t *testing.T, resp *http.Response)
+	}{
+		{
+			name:           "Success - Create Product",
+			payload:        `{"name":"New Product", "price": 1234, "stock": 50}`,
+			setup:          func(t *testing.T) { setupTestDB(t); database.DB.Exec("DELETE FROM products") },
+			expectedStatus: fiber.StatusCreated,
+			verify: func(t *testing.T, resp *http.Response) {
+				var createdProduct models.Product
+				body, _ := io.ReadAll(resp.Body)
+				err := json.Unmarshal(body, &createdProduct)
+				assert.NoError(t, err)
+				assert.Equal(t, "New Product", createdProduct.Name)
+
+			},
+		},
+		{
+			name:    "Failure - Invalid Payload",
+			payload: `{"name":"New Product", "price": "text"}`,
+			setup: func(t *testing.T) {
+				setupTestDB(t)
+				database.DB.Exec("DELETE FROM products")
+			},
+			expectedStatus: fiber.StatusBadRequest,
+			verify:         func(t *testing.T, resp *http.Response) {},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			app := setupTestApp()
+			tc.setup(t)
+			req := httptest.NewRequest("POST", "/api/products", bytes.NewBufferString(tc.payload))
+			req.Header.Set("Content-Type", "application/json")
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() {
+				if err := resp.Body.Close(); err != nil {
+					log.Printf("failed to close response body: %v", err)
+				}
+			}()
+
+			assert.Equal(t, tc.expectedStatus, resp.StatusCode)
+			tc.verify(t, resp)
+		})
+	}
+}
+
+func TestPatchProduct(t *testing.T) {
+	testCases := []struct {
+		name           string
+		productID      func() string
+		payload        string
+		setup          func(t *testing.T) *models.Product
+		expectedStatus int
+		verify         func(t *testing.T, resp *http.Response, originalProduct *models.Product)
+	}{
+		{
+			name: "Success - Patch Product",
+			productID: func() string {
+				var p models.Product
+				database.DB.First(&p)
+				return p.ID.String()
+			},
+			payload: `{"name":"Produto Atualizado"}`,
+			setup: func(t *testing.T) *models.Product {
+				setupTestDB(t)
+				database.DB.Exec("DELETE FROM products")
+				mockProduct := &models.Product{ID: uuid.New(), Name: "Produto Original", Price: 100}
+				database.DB.Create(mockProduct)
+				return mockProduct
+			},
+			expectedStatus: fiber.StatusOK,
+			verify: func(t *testing.T, resp *http.Response, originalProduct *models.Product) {
+				var updatedProduct models.Product
+				body, err := io.ReadAll(resp.Body)
+				assert.NoError(t, err)
+				err = json.Unmarshal(body, &updatedProduct)
+				assert.NoError(t, err)
+				assert.Equal(t, "Produto Atualizado", updatedProduct.Name)
+				assert.Equal(t, originalProduct.Price, updatedProduct.Price)
+			},
+		},
+		{
+			name:      "Failure - Product Not Found",
+			productID: func() string { return uuid.New().String() },
+			payload:   `{"name":"Produto Fantasma"}`,
+			setup: func(t *testing.T) *models.Product {
+				setupTestDB(t)
+				database.DB.Exec("DELETE FROM products")
+				return nil
+			},
+			expectedStatus: fiber.StatusNotFound,
+			verify:         func(t *testing.T, resp *http.Response, originalProduct *models.Product) {},
+		},
+		{
+			name: "Failure - Invalid ID",
+			productID: func() string {
+				return "invalid-id"
+			},
+			payload:        `{"name":"invalid"}`,
+			setup:          func(t *testing.T) *models.Product { setupTestDB(t); return nil },
+			expectedStatus: fiber.StatusBadRequest,
+			verify: func(t *testing.T, resp *http.Response, originalProduct *models.Product) {
+				var errorResponse map[string]string
+				body, err := io.ReadAll(resp.Body)
+				assert.NoError(t, err)
+				err = json.Unmarshal(body, &errorResponse)
+				assert.NoError(t, err)
+				assert.Equal(t, "Invalid UUID format", errorResponse["error"])
+
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			app := setupTestApp()
+			originalProduct := tc.setup(t)
+			productID := tc.productID()
+
+			urlString := fmt.Sprintf("/api/products/%s", productID)
+			req := httptest.NewRequest(http.MethodPatch, urlString, bytes.NewBufferString(tc.payload))
+			req.Header.Set("Content-Type", "application/json")
+
+			resp, err := app.Test(req)
+			assert.NoError(t, err)
+			defer func() {
+				if err := resp.Body.Close(); err != nil {
+					log.Printf("failed to close response body: %v", err)
+				}
+			}()
+
+			assert.Equal(t, tc.expectedStatus, resp.StatusCode)
+			tc.verify(t, resp, originalProduct)
+		})
+	}
+}
+
+func TestDeleteProduct(t *testing.T) {
+	testCases := []struct {
+		name           string
+		productID      func() string
+		setup          func(t *testing.T) *models.Product
+		expectedStatus int
+		verifyDB       func(t *testing.T, originalProduct *models.Product)
+	}{
+		{
+			name: "Sucesso - Deleção de Produto",
+			productID: func() string {
+				var p models.Product
+				database.DB.First(&p)
+				return p.ID.String()
+			},
+			setup: func(t *testing.T) *models.Product {
+				setupTestDB(t)
+				database.DB.Exec("DELETE FROM products")
+				mockProduct := &models.Product{ID: uuid.New(), Name: "Produto Original", Price: 100}
+				database.DB.Create(mockProduct)
+				return mockProduct
+			},
+			expectedStatus: fiber.StatusNoContent,
+			verifyDB: func(t *testing.T, originalProduct *models.Product) {
+				var product models.Product
+				err := database.DB.First(&product, originalProduct.ID).Error
+				assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
+			},
+		},
+		{
+			name:      "Falha - Produto Não Encontrado",
+			productID: func() string { return uuid.New().String() },
+			setup: func(t *testing.T) *models.Product {
+				setupTestDB(t)
+				database.DB.Exec("DELETE FROM products")
+				return nil
+			},
+			expectedStatus: fiber.StatusNotFound,
+			verifyDB:       func(t *testing.T, originalProduct *models.Product) {},
+		},
+		{
+			name: "Failure - Invalid ID",
+			productID: func() string {
+				return "invalid-id"
+			},
+			setup:          func(t *testing.T) *models.Product { setupTestDB(t); return nil },
+			expectedStatus: fiber.StatusBadRequest,
+			verifyDB:       func(t *testing.T, originalProduct *models.Product) {},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			app := setupTestApp()
+			originalProduct := tc.setup(t)
+			productID := tc.productID()
+
+			urlString := fmt.Sprintf("/api/products/%s", productID)
+			req := httptest.NewRequest(http.MethodDelete, urlString, nil)
+
+			resp, _ := app.Test(req)
+			defer func() {
+				if err := resp.Body.Close(); err != nil {
+					log.Printf("failed to close response body: %v", err)
+				}
+			}()
+
+			assert.Equal(t, tc.expectedStatus, resp.StatusCode)
+			tc.verifyDB(t, originalProduct)
 		})
 	}
 }
